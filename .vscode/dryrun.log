@@ -1,5 +1,0 @@
-make: Entering directory `/Users/tuannguyen/Projects/weedy'
-docker-compose up --build
- 
-make: Leaving directory `/Users/tuannguyen/Projects/weedy'
- 
