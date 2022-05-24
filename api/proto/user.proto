@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+option go_package = "/genproto";
+
+package genproto;
+
+import "google/api/annotations.proto";
+
+service UserService {
+    rpc List(ListUsersRequest) returns (ListUsersResponse) {
+        option (google.api.http) = {
+            get: "/user"
+        };
+    }
+
+    rpc Upsert(UpsertUsersRequest) returns (UpsertUsersResponse) {
+        option (google.api.http) = {
+            post: "/user"
+            body: "*"
+        };
+    }
+}
+
+message User {
+    string id = 1;
+    string first_name = 2;
+    string last_name = 3;
+    string email = 4;
+}
+
+message ListUsersRequest {
+    repeated string user_ids = 1;
+}
+
+message ListUsersResponse {
+    repeated User users = 1;
+}
+
+message UpsertUsersRequest {
+    repeated User users = 1;
+}
+
+message UpsertUsersResponse {
+    bool success = 1;
+}
