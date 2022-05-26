@@ -185,5 +185,5 @@ func (s *HttpServer) Run() error {
 
 	fmt.Printf("server listening at %s\n", s.port)
 	handler := cors.AllowAll().Handler(s.router)
-	return http.ListenAndServe(fmt.Sprintf(":%s", "8080"), handler)
+	return http.ListenAndServe(fmt.Sprintf(":%s", s.port), handler)
 }
