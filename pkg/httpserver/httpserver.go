@@ -4,8 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
+
+	"weedy/pkg/config"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -26,7 +29,7 @@ type Response struct {
 	Err        error       `json:"-"`
 	StatusCode int         `json:"-"`
 	Message    string      `json:"message,omitempty"`
-	Data       interface{} `json:"data"`
+	Data       interface{} `json:"data,omitempty"`
 }
 
 func RequestFromContext(ctx context.Context) interface{} {
@@ -59,7 +62,7 @@ type HttpServer struct {
 	controllers []Controller
 }
 
-func NewHttpServer(host string, port string, path string) *HttpServer {
+func NewHttpServer(cfg config.HTTPConfig) *HttpServer {
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
@@ -68,8 +71,8 @@ func NewHttpServer(host string, port string, path string) *HttpServer {
 	r.Use(middleware.Timeout(60 * time.Second))
 
 	return &HttpServer{
-		host:        host,
-		port:        port,
+		host:        cfg.Host,
+		port:        cfg.Port,
 		router:      r,
 		controllers: make([]Controller, 0),
 	}
@@ -162,7 +165,9 @@ func initRoutes(r chi.Router, routes []Route) {
 
 					resp := route.Handler(ctx)
 					if resp.Err != nil {
+						log.Printf("route.Handler err: %v", resp.Err)
 						resp.StatusCode = http.StatusInternalServerError
+						resp.Message = "INTERNAL_SERVER_ERROR"
 						render.Render(w, r, &resp)
 						return
 					}
@@ -178,7 +183,7 @@ func (s *HttpServer) Run() error {
 		initRoutes(s.router, routes)
 	}
 
-	fmt.Println("server listening at 8000")
+	fmt.Printf("server listening at %s\n", s.port)
 	handler := cors.AllowAll().Handler(s.router)
 	return http.ListenAndServe(fmt.Sprintf(":%s", s.port), handler)
 }

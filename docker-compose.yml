@@ -7,14 +7,14 @@ services:
     container_name: app
     env_file: .env
     ports:
-      - 50052:50052
+      - 8080:8080
     volumes:
       - .:/app
     restart: unless-stopped
     depends_on:
       - db
     networks:
-      - m0n3y-api
+      - weedy
 
   db:
     image: postgres
@@ -26,8 +26,8 @@ services:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     networks:
-      - m0n3y-api
+      - weedy
 
 networks:
-  m0n3y-api:
+  weedy:
     driver: bridge
